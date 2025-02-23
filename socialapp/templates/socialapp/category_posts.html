@@ -1,0 +1,36 @@
+{% extends "socialapp/base.html" %}
+
+{% block body %}
+<div class="container">
+    <h1 class="text-center">{{ category.name }} Blogs</h1>
+    <hr>
+    <div class="row justify-content-center g-4">
+        {% for post in posts %}
+        <div class="col-md-6 d-flex justify-content-center">
+            <div class="card h-100 shadow-sm" style="width: 100%; max-width: 800px;">
+                {% if post.image %}
+                <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.content|truncatewords:10 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href="{% url 'post_details' post.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                            {% if user == post.author %}
+                            <a href="{% url 'update_post' post.id %}" class="btn btn-sm btn-outline-warning">Edit</a>
+                            <a href="{% url 'delete_post' post.id %}" class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Are you sure?');">Delete</a>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ post.created_at }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <h3 class="text-center">No posts in this category.</h3>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

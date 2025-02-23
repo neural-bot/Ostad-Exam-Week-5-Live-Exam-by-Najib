@@ -1,0 +1,59 @@
+{% extends "socialapp/base.html" %}
+{% block title %}{{ profile.user.username|title }}'s Profile{% endblock %}
+{% block body %}
+<div class="container">
+    <h2 class="text-center">{{ profile.user.username|title }}'s Profile</h2>
+    <hr>
+    <div class="row justify-content-center g-4">
+        <div class="col-md-6 d-flex justify-content-center">
+            <div class="container">
+                <div class="text-center">
+                    <img src="{{ profile.profile_picture.url }}" alt="Profile Pic" width="200" class="rounded-circle">
+                    <h2>{{ profile.user.username|title }}</h2>
+                    <p>{{ profile.bio }}</p>
+                </div>
+
+                <h3 class="mt-4">Posts by {{ profile.user.username|title }}</h3>
+                <hr>
+                <div class="row g-4">
+                    {% for post in posts %}
+                    <div class="col-md-8 d-flex justify-content-center">
+                        <div class="card h-100 shadow-sm" style="width: 100%; max-width: 600px;">
+                            {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <p class="card-text">{{ post.content|truncatewords:10 }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <a href="{% url 'post_details' post.id %}"
+                                            class="btn btn-sm btn-outline-primary">View</a>
+                                        {% if user == post.author %}
+                                        <a href="{% url 'update_post' post.id %}"
+                                            class="btn btn-sm btn-outline-warning">Edit</a>
+                                        <a href="{% url 'delete_post' post.id %}" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Are you sure?');">Delete</a>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted">{{ post.created_at }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <h3 class="text-center">No posts in this category.</h3>
+                    {% endfor %}
+                </div>
+                
+            </div>
+            {% if user == profile.user %}
+            <div class="text-center mt-3">
+                <a href="{% url 'edit_profile' %}" class="btn btn-warning"><i class="fa-solid fa-pen-to-square"></i></a>
+            </div>
+            {% endif %}
+    
+        </div>
+    </div>
+</div>
+{% endblock %}

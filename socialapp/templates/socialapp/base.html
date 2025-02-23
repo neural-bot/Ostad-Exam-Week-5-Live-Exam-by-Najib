@@ -1,0 +1,155 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NextCircle{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/fevicon.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        body {
+            position: relative;
+            background: var(--bg-color);
+            transition: background-color 0.3s ease;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("{% static 'img/background.png' %}") no-repeat center center fixed;
+            background-size: cover;
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+        }
+
+        .dark-mode {
+            --bg-color: #181818;
+        }
+    </style>
+
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home_page_posts' %}"><img src="{% static 'img/fevicon.png' %}"
+                    alt="icon" style="width: 20px;"><b> NextCircle</b></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
+                aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'home_page_posts' %}"><b>Home</b></a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                            aria-haspopup="true" aria-expanded="false"><b>Categories</b></a>
+                        <div class="dropdown-menu">
+                            {% for category in categories %}
+                            <a class="dropdown-item" href="{% url 'category_posts' category.id %}">{{ category.name
+                                }}</a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                </ul>
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile' user.id %}" class="btn btn-secondary me-sm-2">
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Pic" width="20" height="20"
+                        class="rounded-circle">
+                    <span class="ms-2">{{ user.username|upper }}</span>
+                </a>
+                {% endif %}
+                <button id="themeToggle" class="btn btn-dark me-sm-2">🌙 Dark</button>
+                <form class="d-flex me-sm-2" method="GET" action="{% url 'home_page_posts' %}">
+                    {{ form.query }}
+                    <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                </form>
+                <a class="btn btn-danger me-sm-2" href="{% url 'user_logout' %}">Logout <i
+                        class="fa-solid fa-right-to-bracket"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    {% else %}
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <!-- Left-aligned brand -->
+            <a class="navbar-brand" href="{% url 'home_page_posts' %}"><b>NexCircle</b></a>
+
+            <!-- Right-aligned buttons -->
+            <div class="ms-auto d-flex align-items-center" id="navbarColor01">
+                <button id="themeToggle" class="btn btn-dark me-2">🌙 Dark</button>
+                <a class="btn btn-warning me-2" href="{% url 'user_login' %}">Log In</a>
+                <a class="btn btn-success" href="{% url 'sign_up' %}">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+
+    {% block body %}
+
+    {% endblock %}
+
+
+    <br>
+    <br>
+    <hr>
+    <footer class="mx-auto mb-4 d-flex align-items-center gap-3">
+        <a href="#" target="_blank" class="mt-auto">
+            <i class="fa-brands fa-github"> Github</i>
+        </a>
+        <div class="text-center">
+            <span class="fw-bold">
+                Copyright &copy;
+                <script>document.write(new Date().getFullYear())</script> to Md Najib Ul Azam Mahi
+            </span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS cdn Link -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script for visual mode -->
+    <script>
+        const themeToggle = document.getElementById("themeToggle");
+        const body = document.body;
+
+        function setTheme(theme) {
+            body.setAttribute("data-bs-theme", theme);
+            localStorage.setItem("theme", theme);
+            themeToggle.textContent = theme === "dark" ? "☀️ Light" : "🌙 Dark";
+
+            // Apply background color change for light/dark mode
+            document.documentElement.style.setProperty("--bg-color", theme === "dark" ? "#181818" : "#ffffff");
+        }
+
+        // Toggle theme on button click
+        themeToggle.addEventListener("click", () => {
+            const currentTheme = body.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
+            setTheme(currentTheme);
+        });
+
+        // Load saved theme preference
+        setTheme(localStorage.getItem("theme") || "light");
+
+    </script>
+
+</body>
+
+</html>
